@@ -1,6 +1,6 @@
 theme: jekyll-theme-cayman
-title: [Fasthttp Router Middleware ]
-description: [A easy way to use Middlewares on Fasthttp Routes]
+title: [Go Rex]
+description: [The fastest Golang Regex Parser, with a litle help of C]
 
 include:
   - contributing.md
