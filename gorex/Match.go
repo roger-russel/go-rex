@@ -30,5 +30,9 @@ func Match(pattern string, subject string) bool {
 
 	result := C.match(cpattern, csubject)
 
-	return result != 0
+	if result == 0 {
+		return false
+	}
+
+	return true
 }
