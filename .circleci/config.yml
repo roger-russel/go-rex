@@ -1,0 +1,26 @@
+version: 2
+
+workflows:
+  version: 2
+  test_any:
+    jobs:
+      - test
+
+jobs:
+  test:
+    docker:
+      - image: circleci/golang:1.13
+
+    working_directory: /go/src/github.com/roger-russel/go-rex
+    steps:
+      - checkout
+
+      - run:
+          name: Running Tests
+          command: |
+            make test
+
+      - run:
+          name: Sending Covarege Report
+          command: |
+            bash <(curl -s https://codecov.io/bash)
