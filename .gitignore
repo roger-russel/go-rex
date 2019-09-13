@@ -14,3 +14,5 @@
 # Coverage should not be versionated
 coverage.txt
 coverage.html
+
+c/gorex.o

@@ -90,23 +90,3 @@ int main() {
 
     printf("%s -> %s = %d | %s \n", pattern, subject, result.match, result.error);
 }
-
-void  trash(){    
-	int rv;
-	regex_t exp; //Our compiled expression
-	//1. Compile our expression.
-	//Our regex is "-?[0-9]+(\\.[0-9]+)?". I will explain this later.
-	//REG_EXTENDED is so that we can use Extended regular expressions
-	rv = regcomp(&exp, "([[:alpha:]]+)([[:digit:]])", REG_EXTENDED);
-	if (rv != 0) {
-		printf("regcomp failed with %d\n", rv);
-	}
-	//2. Now run some tests on it
-	regmatch_t m1 = match(&exp, "a0");
-
-
-
-	//3. Free it
-	regfree(&exp);
-	//return 0;
-}
