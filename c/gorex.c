@@ -1,92 +1,43 @@
-#include <stdlib.h>
-#include <regex.h>
-#include <sys/types.h>
+#include <errno.h>
+#include <limits.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <hs/hs.h>
 
-#define DEFAULT_MAX_MATCHES 1 //The maximum number of matches allowed in a single string
-#define FALSE 0
-#define TRUE 1
+typedef struct comp
+{
+  hs_database_t *database;
+  const char *error;
+} comp;
 
-typedef struct sct_result {
-    int match;
-    const char *error;
-} sct_result;
+comp Comp(const char *pattern)
+{
+  hs_database_t *database;
+  hs_compile_error_t *compile_err;
+  if (
+      hs_compile(
+        pattern,
+        HS_FLAG_DOTALL,
+        HS_MODE_BLOCK,
+        NULL,
+        &database,
+        &compile_err)
+      != HS_SUCCESS)
+  {
 
-typedef struct sct_comp {
-    regex_t rgx;
-    const char *error;
-} sct_comp;
-
-sct_comp comp(const char *pattern){
-
-    regex_t re;
-    
-    int rc = regcomp(&re, pattern, REG_EXTENDED|REG_NOSUB);
-
-    if (rc != 0) {
-
-        size_t errcomp = regerror(rc, &re, (char *)NULL, (size_t)0);
-        char * errcomp_str = malloc(errcomp * sizeof(char*));
-        regerror(rc, &re, errcomp_str, errcomp);
-
-        sct_comp response = {
-            rgx: re,
-            error: errcomp_str
-        };
-
-        return response;
-    }
-
-    sct_comp response = {
-        rgx: re,
-        error: NULL
+    comp error = {
+      error : strdup(compile_err->message)
     };
 
-    return response;
-}
+    hs_free_compile_error(compile_err);
 
-sct_result test(const char *pattern, const char *subject) {
-    
-    sct_comp r = comp(pattern);
-
-    if ( r.error != NULL ) {
-
-        sct_result response = {
-            match: FALSE,
-            error: r.error
-        };
-
-        return response;
-    }
-
-    int status = regexec(&r.rgx, subject, 0, NULL, 0);
-    regfree(&r.rgx);
-
-    sct_result response = {
-        match: status == 0, // If status is equal to zero, then regexec matched the result
-        error: NULL,
-    };
-
-    return response;
+    return error;
+  }
 
 }
 
-regmatch_t match(regex_t *pexp, char *subject) {
-	regmatch_t matches[DEFAULT_MAX_MATCHES]; //A list of the matches in the string (a list of 1)
-	//Compare the string to the expression
-	//regexec() returns 0 on match, otherwise REG_NOMATCH
-	regexec(pexp, subject, DEFAULT_MAX_MATCHES, matches, 0);
-	
-    return *matches;
-	
-}
-
-int main() {
-
-    char * pattern = "^([[:alpha:]]+)([[:digit:]]+)$";
-    char * subject = "abc123";
-
-    sct_result result = test(pattern, subject);
-
-    printf("%s -> %s = %d | %s \n", pattern, subject, result.match, result.error);
+void main()
+{
+  comp cmp = Comp("/a(}bc/");
 }
